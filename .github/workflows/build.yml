@@ -135,13 +135,13 @@ jobs:
                 curl -L -o Unity.tar.gz -H "Authorization: Bearer ${token}" "https://registry-1.docker.io/v2/unityci/editor/blobs/$DIGEST"
               fi
               
-              tar -zxvf Unity.tar.gz
+              tar -zxf Unity.tar.gz
               echo "Making UnityData"
-              chmod -R 755 ./Files
-              chmod -R 755 ./Hives
+              chmod -R 755 Files
+              chmod -R 755 Hives
               mkdir UnityData
-              cp -r "./Files/UnityEditor/$VERSION/Data/MonoBleedingEdge/lib/mono/unityaot-linux" UnityData
-              cp -r "./Files/UnityEditor/$VERSION/Data/il2cpp" UnityData
+              cp -r "Files/UnityEditor/$VERSION/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux" UnityData
+              cp -r "Files/UnityEditor/$VERSION/Editor/Data/il2cpp" UnityData
               
               tar cvf - UnityData | gzip -9 - > unitydata-windows.tar.gz
           - uses: actions/upload-artifact@v7
