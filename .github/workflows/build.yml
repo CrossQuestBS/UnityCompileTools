@@ -14,10 +14,31 @@ jobs:
           VERSION: "6000.0.40f1"
           CHANGESET: "157d81624ddf"
         steps:
+          - uses: actions/cache@v5
+            with:
+                path: |
+                  Unity.tar.xz
+                  Unity-android.tar.xz
+                key: Unity-${{ env.VERSION }}-${{ env.CHANGESET }}
           - name: Download Unity Editor
             run: |
+              if [ ! -f Unity.tar.xz ]; then
+                curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorInstallerArm64/Unity-$VERSION.pkg" -o Unity.tar.xz
+              fi
+              
+              echo "Making UnityData"
+              mkdir UnityData
+              7z x Unity.tar.xz
+              7z x Payload~
+              rm -rf Payload~
+              cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
+              cp -r Unity/Unity.app/Contents/il2cpp/build/deploy UnityData/buildtool
+              rm -rf Unity
+
               # Get Android Specific
-              curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorTargetInstaller/UnitySetup-Android-Support-for-Editor-$VERSION.pkg" -o Unity-android.tar.xz
+              if [ ! -f Unity-android.tar.xz ]; then
+                curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorTargetInstaller/UnitySetup-Android-Support-for-Editor-$VERSION.pkg" -o Unity-android.tar.xz
+              fi
               7z x Unity-android.tar.xz
               
               mkdir Android
@@ -39,6 +60,7 @@ jobs:
               cd ..
 
               tar cvf - AndroidPlayer | gzip -9 - > android_player.tar.gz
+              tar cvf - UnityData | gzip -9 - > unity_data.tar.gz
           - uses: actions/upload-artifact@v7
             with:
               archive: false
