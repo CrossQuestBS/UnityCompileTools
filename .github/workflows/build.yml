@@ -7,8 +7,8 @@ on:
       branches: [main]
 
 jobs:
-    build:
-        name: Unity MacOS
+    android-player:
+        name: Get AndroidPlayer
         runs-on: "ubuntu-latest"
         env:
           VERSION: "6000.0.40f1"
@@ -17,24 +17,10 @@ jobs:
           - uses: actions/cache@v5
             with:
                 path: |
-                  Unity.tar.xz
                   Unity-android.tar.xz
-                key: Unity-${{ env.VERSION }}-${{ env.CHANGESET }}
-          - name: Download Unity Editor
+                key: Unity-${{ env.VERSION }}-${{ env.CHANGESET }}-android-player
+          - name: Get AndroidPlayer
             run: |
-              if [ ! -f Unity.tar.xz ]; then
-                curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorInstallerArm64/Unity-$VERSION.pkg" -o Unity.tar.xz
-              fi
-              
-              echo "Making UnityData"
-              mkdir UnityData
-              7z x Unity.tar.xz
-              7z x Payload~ -o./ ./Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux ./Unity/Unity.app/Contents/il2cpp
-              rm -rf Payload~
-              cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
-              cp -r Unity/Unity.app/Contents/il2cpp UnityData
-              rm -rf Unity
-
               # Get Android Specific
               if [ ! -f Unity-android.tar.xz ]; then
                 curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorTargetInstaller/UnitySetup-Android-Support-for-Editor-$VERSION.pkg" -o Unity-android.tar.xz
@@ -59,18 +45,73 @@ jobs:
               cp Variations/il2cpp/Release/Libs/arm64-v8a/libunity.so ../AndroidPlayer/libunity.so
               cd ..
 
-              tar cvf - AndroidPlayer | gzip -9 - > android_player.tar.gz
-              tar cvf - UnityData | gzip -9 - > unity_data.tar.gz
+              tar cvf - AndroidPlayer | gzip -9 - > androidplayer.tar.gz
           - uses: actions/upload-artifact@v7
             with:
               archive: false
-              name: android_player
-              path: android_player.tar.gz
-          - uses: actions/upload-artifact@v7
+              name: androidplayer
+              path: androidplayer.tar.gz
+    build-mac:
+        name: Unity MacOS
+        runs-on: "ubuntu-latest"
+        env:
+          VERSION: "6000.0.40f1"
+          CHANGESET: "157d81624ddf"
+        steps:
+          - uses: actions/cache@v5
             with:
-              archive: false
-              name: unity_data
-              path: unity_data.tar.gz
-          
-
+                path: |
+                  Unity.tar.xz
+                key: Unity-${{ env.VERSION }}-${{ env.CHANGESET }}-mac-os
+          - name: Get UnityData for OSX
+            run: |
+              if [ ! -f Unity.tar.xz ]; then
+                curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorInstallerArm64/Unity-$VERSION.pkg" -o Unity.tar.xz
+              fi
               
+              echo "Making UnityData"
+              mkdir UnityData
+              7z x Unity.tar.xz
+              7z x Payload~ -o./ ./Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux ./Unity/Unity.app/Contents/il2cpp
+              rm -rf Payload~
+              
+              cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
+              cp -r Unity/Unity.app/Contents/il2cpp UnityData
+              rm -rf Unity
+
+              tar cvf - UnityData | gzip -9 - > unitydata-osx.tar.gz
+          - uses: actions/upload-artifact@v7
+            with:
+              archive: false
+              name: unitydata-osx
+              path: unitydata-osx.tar.gz
+    build-linux:
+        name: Get UnityData for Linux
+        runs-on: "ubuntu-latest"
+        env:
+          VERSION: "6000.0.40f1"
+          CHANGESET: "157d81624ddf"
+        steps:
+          - uses: actions/cache@v5
+            with:
+                path: |
+                  Unity.tar.xz
+                key: Unity-${{ env.VERSION }}-${{ env.CHANGESET }}-linux
+          - name: Download Unity Editor
+            run: |
+              if [ ! -f Unity.tar.xz ]; then
+                curl "https://download.unity3d.com/download_unity/$CHANGESET/LinuxEditorInstaller/Unity-$VERSION.tar.xz" -o Unity.tar.xz
+              fi
+              
+              tar -xf Unity.tar.xz
+              echo "Making UnityData"
+              mkdir UnityData
+              cp -r Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
+              cp -r Editor/Data/il2cpp UnityData
+              rm -rf Editor
+              tar cvf - UnityData | gzip -9 - > unitydata-linux.tar.gz
+          - uses: actions/upload-artifact@v7
+            with:
+              archive: false
+              name: unitydata-linux
+              path: unitydata-linux.tar.gz
