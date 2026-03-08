@@ -16,15 +16,6 @@ jobs:
         steps:
           - name: Download Unity Editor
             run: |
-              #curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorInstallerArm64/Unity-$VERSION.pkg" -o Unity.tar.xz
-              #tar -xf Unity.tar.xz
-              #tar -xf Unity.pkg.tmpUnity.pkg.tmp/PayloadUnity.pkg.tmpUnity.pkg.tmp/PayloadUnity.pkg.tmpUnity.pkg.tmp/Payload
-              #rm -rf Unity.pkg.tmpUnity.pkg.tmp
-              #cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
-              #cp -r Unity/Unity.app/Contents/il2cpp/build/deploy UnityData/buildtool
-              #rm -rf Unity
-
-
               # Get Android Specific
               curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorTargetInstaller/UnitySetup-Android-Support-for-Editor-$VERSION.pkg" -o Unity-android.tar.xz
               7z x Unity-android.tar.xz
