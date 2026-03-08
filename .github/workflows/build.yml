@@ -135,7 +135,7 @@ jobs:
                 curl -L -o Unity.tar.gz -H "Authorization: Bearer ${token}" "https://registry-1.docker.io/v2/unityci/editor/blobs/$DIGEST"
               fi
               
-              tar -xfvf Unity.tar.gz
+              tar -zxvf Unity.tar.gz
               echo "Making UnityData"
               chmod -R 755 Files
               chmod -R 755 Hives
