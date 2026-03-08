@@ -1,0 +1,62 @@
+name: Unity Compile Tools
+
+on:
+  push:
+      branches: [main]
+  pull_request:
+      branches: [main]
+
+jobs:
+    build:
+        name: Unity MacOS
+        runs-on: "ubuntu-latest"
+        env:
+          VERSION: "6000.0.40f1"
+          CHANGESET: "157d81624ddf"
+        steps:
+          - name: Download Unity Editor
+            run: |
+              curl "https://download.unity3d.com/download_unity/$CHANGESET/MacEditorInstallerArm64/Unity-$VERSION.pkg" -o Unity.tar.xz
+              tar -xf Unity.tar.xz
+              tar -xf Unity.pkg.tmpUnity.pkg.tmp/PayloadUnity.pkg.tmpUnity.pkg.tmp/PayloadUnity.pkg.tmpUnity.pkg.tmp/Payload
+              rm -rf Unity.pkg.tmpUnity.pkg.tmp
+              cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
+              cp -r Unity/Unity.app/Contents/il2cpp/build/deploy UnityData/buildtool
+              rm -rf Unity
+
+              # Get Android Specific
+              curl "https://download.unity3d.com/download_unity/157d81624ddf/MacEditorTargetInstaller/UnitySetup-Android-Support-for-Editor-6000.0.40f1.pkg" -o Unity-android.tar.xz
+              tar -xf Unity-android.tar.xz
+              
+              mkdir Android
+              mkdir AndroidPlayer
+              cd Android
+              
+              tar -xf ../TargetSupport.pkg.tmpTargetSupport.pkg.tmp/PayloadTargetSupport.pkg.tmpTargetSupport.pkg.tmp/PayloadTargetSupport.pkg.tmpTargetSupport.pkg.tmp/Payload
+              rm -rf ../TargetSupport.pkg.tmpTargetSupport.pkg.tmp
+              
+              cp -r Variations/il2cpp/Managed ../AndroidPlayer/Managed
+              cp Tools/AndroidNativeLink.xml ../AndroidPlayer/AndroidNativeLink.xml
+              cp modules.asset ../AndroidPlayer/modules.asset
+              mkdir StaticLibs
+              cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/baselib.a ../AndroidPlayer/StaticLibs/baselib.a
+              cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/compile.rsp ../AndroidPlayer/StaticLibs/compile.rsp
+              cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/link.rsp ../AndroidPlayer/StaticLibs/link.rsp
+              cp Variations/il2cpp/Release/Libs/arm64-v8a/libunity.so ../AndroidPlayer/libunity.so
+              cd ..
+
+              tar cvf - AndroidPlayer | gzip -9 - > android_player.tar.gz
+              tar cvf - UnityData | gzip -9 - > unity_data.tar.gz
+          - uses: actions/upload-artifact@v7
+            with:
+              archive: false
+              name: android_player
+              path: android_player.tar.gz
+          - uses: actions/upload-artifact@v7
+            with:
+              archive: false
+              name: unity_data
+              path: unity_data.tar.gz
+          
+
+              
