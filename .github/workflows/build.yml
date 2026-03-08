@@ -31,6 +31,7 @@ jobs:
               
               mkdir Android
               mkdir AndroidPlayer
+              mkdir AndroidPlayer/StaticLibs
               cd Android
               
               7z x ../Payload~
@@ -39,7 +40,7 @@ jobs:
               cp -r Variations/il2cpp/Managed ../AndroidPlayer/Managed
               cp Tools/AndroidNativeLink.xml ../AndroidPlayer/AndroidNativeLink.xml
               cp modules.asset ../AndroidPlayer/modules.asset
-              mkdir StaticLibs
+              
               cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/baselib.a ../AndroidPlayer/StaticLibs/baselib.a
               cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/compile.rsp ../AndroidPlayer/StaticLibs/compile.rsp
               cp Variations/il2cpp/Release/StaticLibs/arm64-v8a/link.rsp ../AndroidPlayer/StaticLibs/link.rsp
