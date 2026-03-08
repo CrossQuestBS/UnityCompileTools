@@ -8,7 +8,7 @@ on:
 
 jobs:
     android-player:
-        name: Get AndroidPlayer
+        name: AndroidPlayer
         runs-on: "ubuntu-latest"
         env:
           VERSION: "6000.0.40f1"
@@ -51,8 +51,8 @@ jobs:
               archive: false
               name: androidplayer
               path: androidplayer.tar.gz
-    build-mac:
-        name: Unity MacOS
+    mac:
+        name: MacOS
         runs-on: "ubuntu-latest"
         env:
           VERSION: "6000.0.40f1"
@@ -85,8 +85,8 @@ jobs:
               archive: false
               name: unitydata-osx
               path: unitydata-osx.tar.gz
-    build-linux:
-        name: Get UnityData for Linux
+    linux:
+        name: Linux
         runs-on: "ubuntu-latest"
         env:
           VERSION: "6000.0.40f1"
@@ -115,3 +115,37 @@ jobs:
               archive: false
               name: unitydata-linux
               path: unitydata-linux.tar.gz
+    windows:
+        name: Windows
+        runs-on: "ubuntu-latest"
+        env:
+
+          DIGEST: "sha256:d0b9bb49e7c3553a58cd5eedd772e0edc18265fac067584059e4f3caf60b0c7c"
+        steps:
+          - uses: actions/cache@v5
+            with:
+                path: |
+                  Unity.tar.gz
+                key: Unity-${{ env.DIGEST }}-windows
+          - name: Download Unity Editor
+            run: |
+              if [ ! -f Unity.tar.gz ]; then
+                curl -so "token.json" "https://auth.docker.io/token?service=registry.docker.io&scope=repository:unityci/editor:pull";
+                token=$(cat token.json | jq -jr ".token")
+                curl -L -o Unity.tar.gz -H "Authorization: Bearer ${token}" "https://registry-1.docker.io/v2/unityci/editor/blobs/$DIGEST"
+              fi
+              
+              tar -xfvf Unity.tar.gz
+              echo "Making UnityData"
+              chmod -R 755 Files
+              chmod -R 755 Hives
+              mkdir UnityData
+              cp -r ./Files/UnityEditor/**/Data/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
+              cp -r ./Files/UnityEditor/**/Data/il2cpp UnityData
+              
+              tar cvf - UnityData | gzip -9 - > unitydata-windows.tar.gz
+          - uses: actions/upload-artifact@v7
+            with:
+              archive: false
+              name: unitydata-windows
+              path: unitydata-windows.tar.gz
