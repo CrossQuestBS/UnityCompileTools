@@ -119,8 +119,8 @@ jobs:
         name: Windows
         runs-on: "ubuntu-latest"
         env:
-
-          DIGEST: "sha256:d0b9bb49e7c3553a58cd5eedd772e0edc18265fac067584059e4f3caf60b0c7c"
+          VERSION: "6000.0.40f1"
+          DIGEST: "sha256:c62d20e92f609345d0ff4871e42fc1fedc6e76f7dfe61eddcb8cbfa67dc24a8c"
         steps:
           - uses: actions/cache@v5
             with:
@@ -137,11 +137,11 @@ jobs:
               
               tar -zxvf Unity.tar.gz
               echo "Making UnityData"
-              chmod -R 755 Files
-              chmod -R 755 Hives
+              chmod -R 755 ./Files
+              chmod -R 755 ./Hives
               mkdir UnityData
-              cp -r ./Files/UnityEditor/**/Data/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
-              cp -r ./Files/UnityEditor/**/Data/il2cpp UnityData
+              cp -r "./Files/UnityEditor/$VERSION/Data/MonoBleedingEdge/lib/mono/unityaot-linux" UnityData
+              cp -r "./Files/UnityEditor/$VERSION/Data/il2cpp" UnityData
               
               tar cvf - UnityData | gzip -9 - > unitydata-windows.tar.gz
           - uses: actions/upload-artifact@v7
