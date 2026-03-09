@@ -72,7 +72,7 @@ jobs:
               echo "Making UnityData"
               mkdir UnityData
               7z x Unity.tar.xz
-              7z x Payload~ -o./ ./Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux ./Unity/Unity.app/Contents/il2cpp
+              7z x Payload~ -o./ ./Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux ./Unity/Unity.app/Contents/il2cpp ./Unity/Unity.app/Contents/Tools
               rm -rf Payload~
               
               cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
