@@ -77,6 +77,8 @@ jobs:
               
               cp -r Unity/Unity.app/Contents/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
               cp -r Unity/Unity.app/Contents/il2cpp UnityData
+              cp -r Unity/Unity.app/Contents/Tools/BuildPlayerDataGenerator UnityData
+              cp -r Unity/Unity.app/Contents/Tools/netcorerun UnityData
               rm -rf Unity
 
               tar cvf - UnityData | gzip -9 - > unitydata-osx.tar.gz
@@ -108,6 +110,8 @@ jobs:
               mkdir UnityData
               cp -r Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux UnityData
               cp -r Editor/Data/il2cpp UnityData
+              cp -r Editor/Data/Tools/BuildPlayerDataGenerator UnityData
+              cp -r Editor/Data/Tools/netcorerun UnityData
               rm -rf Editor
               tar cvf - UnityData | gzip -9 - > unitydata-linux.tar.gz
           - uses: actions/upload-artifact@v7
@@ -142,6 +146,8 @@ jobs:
               mkdir UnityData
               cp -r "Files/UnityEditor/$VERSION/Editor/Data/MonoBleedingEdge/lib/mono/unityaot-linux" UnityData
               cp -r "Files/UnityEditor/$VERSION/Editor/Data/il2cpp" UnityData
+              cp -r "Files/UnityEditor/$VERSION/Editor/Data/Tools/BuildPlayerDataGenerator" UnityData
+              cp -r "Files/UnityEditor/$VERSION/Editor/Data/Tools/netcorerun" UnityData
               
               tar cvf - UnityData | gzip -9 - > unitydata-windows.tar.gz
           - uses: actions/upload-artifact@v7
